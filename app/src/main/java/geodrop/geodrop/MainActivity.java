@@ -52,4 +52,10 @@ public class MainActivity extends AppCompatActivity implements
             mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
         }
     }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+
+    }
 }
