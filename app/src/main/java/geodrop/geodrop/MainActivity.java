@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements
         LocationListener
 {
     // Preferred delay between location updates
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
 
     // Minimum delay between location updates
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
@@ -78,33 +78,15 @@ public class MainActivity extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API) // This line lets us use location services
                 .build();
-
         createLocationRequest();
     }
 
     protected void createLocationRequest()
     {
-        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        try
-        {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
-
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                    .addLocationRequest(mLocationRequest);
-
-            PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
-                            builder.build());
-        }
-        catch(SecurityException e)
-        {
-            Log.i(TAG, "Location security not granted");
-        }
     }
 
     @Override
@@ -131,28 +113,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle connectionHint)
     {
+        //Called when the GoogleApiClient connects
         try
         {
-            //Called when the GoogleApiClient connects
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mCurrentLocation != null)
-            {
-                mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
-                mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
-            }
 
-            if (mCurrentLocation != null)
-            {
-                // Update the screen to reflect the location
-                mLatitudeText.setText(String.format("%s: %f", mLatitudeLabel,
-                        mCurrentLocation.getLatitude()));
-                mLongitudeText.setText(String.format("%s: %f", mLongitudeLabel,
-                        mCurrentLocation.getLongitude()));
-            }
-            else
+            if (mCurrentLocation == null)
             {
                 Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
             }
+
+            startLocationUpdates();
         }
         catch(SecurityException e)
         {
@@ -176,6 +147,27 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location)
     {
+        mCurrentLocation = location;
+        updateUI();
+        Toast.makeText(this, R.string.location_updated, Toast.LENGTH_LONG).show();
+    }
 
+    protected void startLocationUpdates()
+    {
+        try
+        {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
+        catch(SecurityException e)
+        {
+
+        }
+    }
+
+    private void updateUI()
+    {
+        mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
+        mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
     }
 }
