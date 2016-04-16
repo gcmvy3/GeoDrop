@@ -1,7 +1,11 @@
 package geodrop.geodrop;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,60 +23,24 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 
-public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener
+public class MainActivity extends AppCompatActivity
 {
-    // Preferred delay between location updates
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
-
-    // Minimum delay between location updates
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-
     protected static final String TAG = "MainActivity";
 
-    protected GoogleApiClient mGoogleApiClient;
-
-    protected LocationRequest mLocationRequest;
-
-    // The most recent location of the user's phone
-    public static Location mCurrentLocation;
+    ActiveLocationService activeLocationService;
 
     // For displaying the user's location on the screen
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
+
+    // Tracks whether the location service is bound
+    private boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Create an instance of GoogleAPIClient to use for location tracking
-        if (mGoogleApiClient == null)
-        {
-            buildGoogleApiClient();
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient()
-    {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API) // This line lets us use location services
-                .build();
-        createLocationRequest();
-    }
-
-    protected void createLocationRequest()
-    {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
@@ -80,8 +48,9 @@ public class MainActivity extends AppCompatActivity implements
     {
         super.onStart();
 
-        // Connect to the Google servers for location tracking
-        mGoogleApiClient.connect();
+        // Launch a location service and bind to it
+        Intent intent = new Intent(this, ActiveLocationService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -89,62 +58,11 @@ public class MainActivity extends AppCompatActivity implements
     {
         super.onStop();
 
-        // Disconnect from the google location servers
-        if(mGoogleApiClient.isConnected())
+        // Unbind from the location service
+        if (mBound)
         {
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint)
-    {
-        //Called when the GoogleApiClient connects
-        try
-        {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-            if (mCurrentLocation == null)
-            {
-                Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-            }
-
-            startLocationUpdates();
-        }
-        catch(SecurityException e)
-        {
-            Log.i(TAG, "User did not grant location permission");
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i)
-    {
-        Log.i(TAG, "Connection suspended, trying to reconnect");
-        mGoogleApiClient.connect(); // Attempts to reconnect to the API
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
-    {
-        Log.i(TAG, "Connection to Google API failed!");
-    }
-
-    @Override
-    public void onLocationChanged(Location location)
-    {
-    }
-
-    protected void startLocationUpdates()
-    {
-        try
-        {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
-        }
-        catch(SecurityException e)
-        {
-
+            unbindService(mConnection);
+            mBound = false;
         }
     }
 
@@ -152,4 +70,23 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, DebugActivity.class);
         startActivity(intent);
     }
+
+    // Used to communicate with the ActiveLocationService
+    private ServiceConnection mConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ActiveLocationService.LocalBinder binder = (ActiveLocationService.LocalBinder) service;
+            activeLocationService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0)
+        {
+            mBound = false;
+        }
+    };
 }
