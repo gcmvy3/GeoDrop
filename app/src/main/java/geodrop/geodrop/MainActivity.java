@@ -1,10 +1,12 @@
 package geodrop.geodrop;
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,33 +38,17 @@ public class MainActivity extends AppCompatActivity implements
     protected LocationRequest mLocationRequest;
 
     // The most recent location of the user's phone
-    private Location mCurrentLocation;
+    public static Location mCurrentLocation;
 
     // For displaying the user's location on the screen
-    protected String mLatitudeLabel;
-    protected String mLongitudeLabel;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
-
-    protected TextView mLatitudeLabelText;
-    protected TextView mLongitudeLabelText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mLatitudeLabel = getResources().getString(R.string.latitude_label);
-        mLongitudeLabel = getResources().getString(R.string.longitude_label);
-        mLatitudeText = (TextView) findViewById((R.id.latitude_text));
-        mLongitudeText = (TextView) findViewById((R.id.longitude_text));
-
-        mLatitudeLabelText = (TextView) findViewById((R.id.latitude_label_text));
-        mLongitudeLabelText = (TextView) findViewById((R.id.longitude_label_text));
-
-        mLatitudeLabelText.setText(mLatitudeLabel);
-        mLongitudeLabelText.setText(mLongitudeLabel);
 
         // Create an instance of GoogleAPIClient to use for location tracking
         if (mGoogleApiClient == null)
@@ -147,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location)
     {
-        mCurrentLocation = location;
-        updateUI();
-        Toast.makeText(this, R.string.location_updated, Toast.LENGTH_LONG).show();
     }
 
     protected void startLocationUpdates()
@@ -165,9 +148,8 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void updateUI()
-    {
-        mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
-        mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
+    public void openDebug(View view) {
+        Intent intent = new Intent(this, DebugActivity.class);
+        startActivity(intent);
     }
 }
