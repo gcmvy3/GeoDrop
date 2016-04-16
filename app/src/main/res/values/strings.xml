@@ -2,5 +2,6 @@
     <string name="app_name">GeoDrop</string>
     <string name="latitude_label">Latitude </string>
     <string name="longitude_label">Longitude </string>
-    <string name="no_location_detected">No location detected</string>
+    <string name="no_location_detected">No Location Detected</string>
+    <string name="location_updated">Location Updated</string>
 </resources>
