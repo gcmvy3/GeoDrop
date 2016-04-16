@@ -12,5 +12,38 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tommy is so fucking cute!" />
+        android:text="Latitude goes here"
+        android:id="@+id/latitude_text"
+        android:layout_above="@+id/longitude_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="75dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Longitude goes here"
+        android:id="@+id/longitude_text"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Default"
+        android:id="@+id/latitude_label_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="28dp"
+        android:layout_above="@+id/latitude_text" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Default"
+        android:id="@+id/longitude_label_text"
+        android:layout_marginBottom="25dp"
+        android:layout_above="@+id/longitude_text"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
