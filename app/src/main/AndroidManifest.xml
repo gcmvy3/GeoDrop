@@ -18,9 +18,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DebugActivity"></activity>
+        <activity android:name=".DebugActivity" />
+
         <service android:name=".PassiveLocationService" />
         <service android:name=".ActiveLocationService" />
+
+        <activity android:name=".SearchActivity"></activity>
     </application>
 
 </manifest>
