@@ -1,14 +1,20 @@
 package geodrop.geodrop;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,18 +24,29 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
 // LocationService runs in the background and tracks the user's location
 public class PassiveLocationService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
+    final static String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
+
+    private static URL url;
+
     // Preferred delay between location updates
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 50000;
+    public static final long UPDATE_INTERVAL_IN_MS = 30000;
 
     // Minimum delay between location updates
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MS =
+                                    UPDATE_INTERVAL_IN_MS / 2;
 
     // Used to communicate with the Google servers
     protected GoogleApiClient mGoogleApiClient;
@@ -63,8 +80,8 @@ public class PassiveLocationService extends Service implements
     protected void createLocationRequest()
     {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MS);
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -106,6 +123,12 @@ public class PassiveLocationService extends Service implements
     public void onLocationChanged(Location location)
     {
         mCurrentLocation = location;
+
+        if(location != null)
+        {
+            // Ask the server whether there are any nearby drops
+            new ServerTask().execute(location.getLatitude(), location.getLongitude());
+        }
     }
 
     protected void startLocationUpdates()
@@ -128,7 +151,7 @@ public class PassiveLocationService extends Service implements
 
         mGoogleApiClient.connect();
 
-        return super.onStartCommand(intent,flags,startId);
+        return START_STICKY;
     }
 
     @Override
@@ -147,5 +170,104 @@ public class PassiveLocationService extends Service implements
     {
         // Not needed, since this is not a bound service
         return null;
+    }
+
+    public void createNotification()
+    {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.notification_icon) //TODO: notification icon
+                        .setContentTitle("Nearby Drop")
+                        .setContentText("You're close to a drop! Tap to see it.");
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Build and display the notification
+        // mId allows you to update the notification later on.
+        int mId = 28;
+        mNotificationManager.notify(mId, mBuilder.build());
+    }
+
+    // This AsyncTask takes in a latitude and longitude and sends them to the server
+    // If there is a nearby drop, the server returns true
+    private class ServerTask extends AsyncTask<Double, Void, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Double... params)
+        {
+            if (mCurrentLocation != null)
+            {
+                String urlString = "uninitialized";
+                try
+                {
+                    urlString = IP + "latitude=" + params[0] + "&" + "longitude=" + params[1];
+
+                    url = new URL(urlString);
+                }
+                catch (MalformedURLException e)
+                {
+                    Log.i("Active Location Service", "Invalid URL!");
+                }
+
+                URLConnection connection = null;
+                try
+                {
+                    connection = url.openConnection();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                    {
+                        String currentLine = null;
+                        while ((currentLine = reader.readLine()) != null)
+                        {
+                            if (currentLine.equals("true"))
+                            {
+                                return true;
+                            } else if (currentLine.equals("false"))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+                Log.i("Active Location Service", "Sending data to server!");
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isNearbyDrop)
+        {
+            super.onPostExecute(isNearbyDrop);
+
+            // If there is a nearby drop, show a notification
+            if(isNearbyDrop)
+            {
+               createNotification();
+            }
+        }
     }
 }
