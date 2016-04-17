@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ImageView iv = (ImageView)findViewById(R.id.globeid);
+        iv.setImageResource(R.drawable.globe);
+
         locationUpdater = new Thread() {
             Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -66,6 +70,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+
+        ImageView imageV = (ImageView)findViewById(R.id.globeid);
+        imageV.setImageResource(R.drawable.globe);
     }
 
     @Override
