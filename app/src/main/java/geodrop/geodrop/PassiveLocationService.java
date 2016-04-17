@@ -39,7 +39,7 @@ public class PassiveLocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
-    final static String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
+    static String IP;
 
     private static URL url;
 
@@ -64,6 +64,8 @@ public class PassiveLocationService extends Service implements
     @Override
     public void onCreate()
     {
+        IP = getResources().getString(R.string.IP) + "getifnearby?";
+
         // Create an instance of GoogleAPIClient to use for location tracking
         if (mGoogleApiClient == null)
         {
