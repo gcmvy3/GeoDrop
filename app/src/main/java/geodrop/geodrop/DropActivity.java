@@ -96,6 +96,7 @@ public class DropActivity extends AppCompatActivity {
                 try
                 {
                     connection = url.openConnection();
+                    connection.setConnectTimeout(5000);
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                     {
@@ -130,13 +131,11 @@ public class DropActivity extends AppCompatActivity {
             // If there is a nearby drop, show a notification
             if (wasSuccessful)
             {
-                //TODO: confirm that it was successful
                 EDIT.setText("");
                 label2.setText("Message Sent");
             }
             else
             {
-                //TODO: pop an error dialog
                 label.setText("Message did not Drop");
             }
         }
