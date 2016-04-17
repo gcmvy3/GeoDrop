@@ -188,11 +188,14 @@ public class DebugActivity extends AppCompatActivity {
         }
     };
 
-    public void startListening(View view) {
-
+    public void startListening(View view)
+    {
+        Intent intent = new Intent(this, PassiveLocationService.class);
+        startService(intent);
     }
 
-    public void stopListening(View view) {
+    public void stopListening(View view)
+    {
 
     }
 }

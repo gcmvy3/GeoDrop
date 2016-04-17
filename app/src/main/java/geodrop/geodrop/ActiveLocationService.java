@@ -39,9 +39,9 @@ public class ActiveLocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
-    final String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
+    final static String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
 
-    private URL url;
+    private static URL url;
 
     // Preferred delay between location updates
     public static final long UPDATE_INTERVAL_IN_MS = 50;
