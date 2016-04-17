@@ -211,6 +211,11 @@ public class DebugActivity extends AppCompatActivity {
 
     }
 
+    public void pingServer(View view)
+    {
+        new ServerTask().execute();
+    }
+
     // This AsyncTask pings the server to see if it is connected
     private class ServerTask extends AsyncTask<Void, Void, Boolean>
     {
@@ -235,6 +240,8 @@ public class DebugActivity extends AppCompatActivity {
                     connection = url.openConnection();
                     connection.setConnectTimeout(5000);
 
+                    System.out.println("Connected to server!");
+
                     InputStream is = connection.getInputStream();
                     InputStreamReader isr = new InputStreamReader(is);
                     BufferedReader reader = new BufferedReader(isr);
@@ -242,7 +249,7 @@ public class DebugActivity extends AppCompatActivity {
                     String currentLine = null;
                     while ((currentLine = reader.readLine()) != null)
                     {
-                        if (currentLine.equals("true"))
+                        if (currentLine.equals("Yes"))
                         {
                             return true;
                         }
@@ -257,12 +264,25 @@ public class DebugActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            serverStatusText.setText("Pinging Server...");
+        }
+
+        @Override
         protected void onPostExecute(Boolean receivedResponse)
         {
             super.onPostExecute(receivedResponse);
 
             if(receivedResponse)
             {
+                serverStatusText.setText("Server Connected!");
+            }
+            else
+            {
+                serverStatusText.setText("No response!");
             }
         }
     }

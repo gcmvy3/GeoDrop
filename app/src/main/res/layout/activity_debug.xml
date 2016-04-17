@@ -85,22 +85,25 @@
         android:layout_marginBottom="45dp"
         android:layout_above="@+id/button3"
         android:layout_toLeftOf="@+id/server_status_text"
-        android:layout_toStartOf="@+id/server_status_text" />
+        android:layout_toStartOf="@+id/server_status_text"
+        android:onClick="pingServer" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
+        android:text="Ping the server"
         android:id="@+id/server_status_text"
         android:textColor="#ffffff"
-        android:layout_alignTop="@+id/ping_button"
+        android:layout_alignBottom="@+id/ping_button"
         android:layout_alignLeft="@+id/longitude_label_text"
         android:layout_alignStart="@+id/longitude_label_text"
-        android:layout_marginLeft="27dp"
-        android:layout_marginStart="27dp"
-        android:layout_alignBottom="@+id/ping_button"
-        android:layout_alignParentStart="true" />
+        android:layout_marginLeft="39dp"
+        android:layout_marginStart="39dp"
+        android:layout_alignTop="@+id/ping_button"
+        android:elegantTextHeight="false"
+        android:singleLine="false"
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="wrap_content"
