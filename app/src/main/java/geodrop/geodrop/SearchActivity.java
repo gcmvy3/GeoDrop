@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class SearchActivity extends AppCompatActivity implements SensorEventListener
@@ -35,6 +36,8 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     private float mCurrentDegree = 0f;
 
     TextView tvHeading;
+
+    ImageView arrowV;
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
@@ -73,6 +76,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        arrowV = (ImageView)findViewById(R.id.arrowView);
+        arrowV.setImageResource(R.drawable.arrow);
     }
 
     @Override
@@ -157,6 +163,8 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             mCurrentDegree = -azimuthInDegress;
         }
         tvHeading.setText("Heading: " + Float.toString(mCurrentDegree) + " degrees");
+
+        arrowV.setRotation(mCurrentDegree);
     }
 
     @Override

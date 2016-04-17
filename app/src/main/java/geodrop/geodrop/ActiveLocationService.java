@@ -220,6 +220,7 @@ public class ActiveLocationService extends Service implements
                 try
                 {
                     connection = url.openConnection();
+                    connection.setConnectTimeout(5000);
 
                     InputStream is = connection.getInputStream();
                     InputStreamReader isr = new InputStreamReader(is);
