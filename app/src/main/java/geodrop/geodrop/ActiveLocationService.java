@@ -128,6 +128,8 @@ public class ActiveLocationService extends Service implements
     public void onLocationChanged(Location location)
     {
         mCurrentLocation = location;
+
+        //TODO: send this data to the bound activity
     }
 
     protected void startLocationUpdates()

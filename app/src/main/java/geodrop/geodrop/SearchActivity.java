@@ -18,11 +18,36 @@ public class SearchActivity extends AppCompatActivity
 
     private Location mLocation;
 
+    // This thread updates the location every few seconds
+    Thread locationUpdater;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        locationUpdater = new Thread()
+        {
+            public void run()
+            {
+                while(!Thread.currentThread().isInterrupted())
+                {
+                    if (mBound)
+                    {
+                        mLocation = activeLocationService.getLocation();
+                    }
+
+                    try
+                    {
+                        Thread.sleep(5000);
+                    }
+                    catch(Exception e)
+                    {
+                    }
+                }
+            }
+        };
     }
 
     @Override
@@ -33,6 +58,8 @@ public class SearchActivity extends AppCompatActivity
         // Launch a location service and bind to it
         Intent intent = new Intent(this, ActiveLocationService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        locationUpdater.start();
     }
 
     @Override
@@ -46,6 +73,8 @@ public class SearchActivity extends AppCompatActivity
             unbindService(mConnection);
             mBound = false;
         }
+
+        locationUpdater.interrupt();
     }
 
     // Used to communicate with the ActiveLocationService
