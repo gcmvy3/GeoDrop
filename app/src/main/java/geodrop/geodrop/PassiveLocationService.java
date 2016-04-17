@@ -7,6 +7,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.HandlerThread;
@@ -56,6 +58,8 @@ public class PassiveLocationService extends Service implements
 
     // The most recent location of the user's phone
     private Location mCurrentLocation;
+
+    private boolean hasNotified = false;
 
     @Override
     public void onCreate()
@@ -178,7 +182,11 @@ public class PassiveLocationService extends Service implements
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_notif) //TODO: notification icon
+                        .setAutoCancel(true)
                         .setContentTitle("Nearby Drop")
+                        .setPriority(1)  //High priority
+                        .setDefaults(-1) //Allow lights, sound, and vibration
+                        .setVibrate(new long[]{0, 500, 110, 500, 110, 450, 110, 200, 110, 170, 40, 450, 110, 200, 110, 170, 40, 500})
                         .setContentText("You're close to a drop! Tap to see it.");
 
         // Creates an explicit intent for an Activity in your app
@@ -270,9 +278,10 @@ public class PassiveLocationService extends Service implements
             super.onPostExecute(isNearbyDrop);
 
             // If there is a nearby drop, show a notification
-            if(isNearbyDrop)
+            if(isNearbyDrop && !hasNotified)
             {
                createNotification();
+                hasNotified = true;
             }
         }
     }
