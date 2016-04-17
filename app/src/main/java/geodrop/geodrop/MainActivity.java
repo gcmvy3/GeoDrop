@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void dropMessage(View view) {
-        Intent intent = new Intent(this, DebugActivity.class);
+        Intent intent = new Intent(this, DropActivity.class);
         startActivity(intent);
     }
 }

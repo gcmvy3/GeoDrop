@@ -4,4 +4,5 @@
     <string name="longitude_label">Longitude </string>
     <string name="no_location_detected">No Location Detected</string>
     <string name="location_updated">Location Updated</string>
+    <string name="drop">Drop!</string>
 </resources>
