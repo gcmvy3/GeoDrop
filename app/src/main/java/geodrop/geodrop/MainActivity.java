@@ -27,14 +27,9 @@ public class MainActivity extends AppCompatActivity
 {
     protected static final String TAG = "MainActivity";
 
-    ActiveLocationService activeLocationService;
-
     // For displaying the user's location on the screen
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
-
-    // Tracks whether the location service is bound
-    private boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,46 +42,16 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-
-        // Launch a location service and bind to it
-        Intent intent = new Intent(this, ActiveLocationService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
-
-        // Unbind from the location service
-        if (mBound)
-        {
-            unbindService(mConnection);
-            mBound = false;
-        }
     }
 
     public void openDebug(View view) {
         Intent intent = new Intent(this, DebugActivity.class);
         startActivity(intent);
     }
-
-    // Used to communicate with the ActiveLocationService
-    private ServiceConnection mConnection = new ServiceConnection()
-    {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ActiveLocationService.LocalBinder binder = (ActiveLocationService.LocalBinder) service;
-            activeLocationService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0)
-        {
-            mBound = false;
-        }
-    };
 }
