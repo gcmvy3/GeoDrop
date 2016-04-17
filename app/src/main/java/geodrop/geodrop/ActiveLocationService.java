@@ -232,7 +232,8 @@ public class ActiveLocationService extends Service implements
                             if (currentLine.equals("true"))
                             {
                                 return true;
-                            } else if (currentLine.equals("false"))
+                            }
+                            else if (currentLine.equals("false"))
                             {
                                 return false;
                             }

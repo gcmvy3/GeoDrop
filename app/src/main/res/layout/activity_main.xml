@@ -7,6 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/background_material_dark"
     tools:context="geodrop.geodrop.MainActivity">
 
     <Button
@@ -52,7 +53,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Go exploring to find new messages!"
         android:id="@+id/textView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:textAlignment="center" />
 
     <ImageView
         android:layout_width="wrap_content"

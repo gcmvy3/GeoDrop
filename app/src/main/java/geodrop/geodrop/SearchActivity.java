@@ -9,15 +9,28 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class SearchActivity extends AppCompatActivity implements SensorEventListener
 {
     ActiveLocationService activeLocationService;
+
+    String IP;
+
+    URL url;
 
     // Tracks whether the location service is bound
     private boolean mBound = false;
@@ -47,6 +60,8 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        IP = getResources().getString(R.string.IP) + "getdrops?";
 
         locationUpdater = new Thread()
         {
@@ -171,5 +186,96 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     public void onAccuracyChanged(Sensor sensor, int accuracy)
     {
 
+    }
+
+    // This AsyncTask takes in a latitude and longitude and sends them to the server
+    // The server returns a list of nearby drops
+    private class ServerTask extends AsyncTask<Double, Void, Drop[]>
+    {
+        @Override
+        protected Drop[] doInBackground(Double... params)
+        {
+            Drop[] drops = new Drop[0];
+
+            String urlString = "uninitialized";
+            try
+            {
+                urlString = IP + "latitude=" + params[0] + "&longitude=";
+
+                url = new URL(urlString);
+            }
+            catch (MalformedURLException e)
+            {
+                Log.i("Active Location Service", "Invalid URL!");
+            }
+
+            URLConnection connection = null;
+            try
+            {
+                connection = url.openConnection();
+                connection.setConnectTimeout(5000);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                {
+                    String currentLine = null;
+                    while ((currentLine = reader.readLine()) != null)
+                    {
+                        //Reads in a huge string from the server and parses drops from it
+                        //Format of data from the server:
+
+                        // success
+                        // num drops
+                        // for : drop:
+                        //     lat
+                        //     lon
+                        //     numLines of message
+                        //     message
+                        //     */
+                        if(currentLine.equals("Success"))
+                        {
+                            int numDrops = Integer.parseInt(reader.readLine());
+
+                            drops = new Drop[numDrops];
+
+                            double lat;
+                            double lon;
+                            int numLines;
+                            String message;
+
+                            for(int i = 0; i < numDrops; i++)
+                            {
+                                lat = Double.parseDouble(reader.readLine());
+                                lon = Double.parseDouble(reader.readLine());
+
+                                numLines = Integer.parseInt(reader.readLine());
+                                message = "";
+
+                                for(int j = 0; j < numLines; j++)
+                                {
+                                    message += reader.readLine();
+                                }
+
+                                Drop drop = new Drop(lat, lon, message);
+                                drops[i] = drop;
+                            }
+                        }
+                    }
+                }
+
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            Log.i("Active Location Service", "Pulling drops from server!");
+
+            return drops;
+        }
+
+        @Override
+        protected void onPostExecute(Drop[] drops)
+        {
+            super.onPostExecute(drops);
+        }
     }
 }

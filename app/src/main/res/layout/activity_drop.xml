@@ -7,7 +7,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="geodrop.geodrop.DropActivity">
+    tools:context="geodrop.geodrop.DropActivity"
+    android:background="@color/background_material_dark">
 
     <Button
         android:layout_width="wrap_content"
@@ -16,7 +17,9 @@
         android:id="@+id/button5"
         android:onClick="sendDrop"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:background="@color/colorPrimary" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -27,7 +30,11 @@
         android:hint="Type Here"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/textView2" />
+        android:layout_above="@+id/textView2"
+        android:background="@color/background_floating_material_dark"
+        android:textColor="#ffffff"
+        android:autoText="false"
+        android:textColorHint="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"

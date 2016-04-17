@@ -7,7 +7,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="geodrop.geodrop.DebugActivity">
+    tools:context="geodrop.geodrop.DebugActivity"
+    android:background="@color/background_material_dark">
 
     <TextView
         android:layout_width="wrap_content"
@@ -16,7 +17,8 @@
         android:id="@+id/latitude_text_debug"
         android:layout_above="@+id/longitude_text_debug"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="75dp" />
+        android:layout_marginBottom="75dp"
+        android:textColor="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,7 +26,8 @@
         android:text="Longitude goes here"
         android:id="@+id/longitude_text_debug"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -34,7 +37,8 @@
         android:id="@+id/latitude_label_text"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="28dp"
-        android:layout_above="@+id/latitude_text_debug" />
+        android:layout_above="@+id/latitude_text_debug"
+        android:textColor="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,7 +48,8 @@
         android:id="@+id/longitude_label_text"
         android:layout_marginBottom="25dp"
         android:layout_above="@+id/longitude_text_debug"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff" />
 
     <Button
         android:layout_width="wrap_content"
@@ -55,7 +60,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textColor="#ffffff"
-        android:onClick="startListening" />
+        android:onClick="startListening"
+        android:background="@color/colorPrimary" />
 
     <Button
         android:layout_width="wrap_content"
@@ -66,6 +72,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textColor="#ffffff"
-        android:onClick="stopListening" />
+        android:onClick="stopListening"
+        android:background="@color/colorPrimary" />
 
 </RelativeLayout>
