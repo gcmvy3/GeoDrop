@@ -209,6 +209,10 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                     (Math.sqrt(mLocation.getLongitude() * mLocation.getLongitude() + closestLong * closestLong)+
                             Math.sqrt(mLocation.getLatitude() * mLocation.getLatitude() + closestLat * closestLat));
         }
+        else
+        {
+            degree2 = 0;
+        }
         arrowV.setRotation(total + (float) degree2);
         tvHeading.setText("Heading: " + Float.toString(total) + " degrees");
     }
@@ -314,14 +318,13 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
             if(drops.length > 0 && drops[0] != null)
             {
-                System.out.println("Debug");
                 closestLat = drops[0].latitude;
                 closestLong = drops[0].longitude;
             }
             else
             {
-                closestLat = 0;
-                closestLong = 0;
+                closestLat = 1;
+                closestLong = 1;
             }
 
             MessagesActivity.updateMessages(messages);

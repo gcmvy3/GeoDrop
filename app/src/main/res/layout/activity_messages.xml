@@ -8,16 +8,37 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="geodrop.geodrop.MessagesActivity"
-    android:background="@color/background_floating_material_light">
+    android:background="@color/background_material_dark">
 
     <ListView
         android:id="@+id/months_list"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="false"
-        android:drawSelectorOnTop="false"
+        android:drawSelectorOnTop="true"
         android:background="@color/background_floating_material_light"
-        android:entries="@color/background_material_dark">
+        android:entries="@color/background_material_dark"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/textView6">
     </ListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Nearby Drops"
+        android:id="@+id/textView6"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="#ffffff"
+        android:textAlignment="center"
+        android:textSize="28dp"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="10dp" />
 
 </RelativeLayout>
