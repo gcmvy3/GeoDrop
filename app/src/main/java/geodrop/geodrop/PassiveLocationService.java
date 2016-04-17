@@ -126,6 +126,7 @@ public class PassiveLocationService extends Service implements
 
         if(location != null)
         {
+            System.out.println("Location Changed!");
             // Ask the server whether there are any nearby drops
             new ServerTask().execute(location.getLatitude(), location.getLongitude());
         }
@@ -176,7 +177,7 @@ public class PassiveLocationService extends Service implements
     {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.notification_icon) //TODO: notification icon
+                        .setSmallIcon(R.drawable.ic_notif) //TODO: notification icon
                         .setContentTitle("Nearby Drop")
                         .setContentText("You're close to a drop! Tap to see it.");
 
@@ -241,9 +242,14 @@ public class PassiveLocationService extends Service implements
                             if (currentLine.equals("true"))
                             {
                                 return true;
-                            } else if (currentLine.equals("false"))
+                            }
+                            else if (currentLine.equals("false"))
                             {
                                 return false;
+                            }
+                            else
+                            {
+                                System.out.println("Server Error");
                             }
                         }
                     }
