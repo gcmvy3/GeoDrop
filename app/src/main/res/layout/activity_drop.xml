@@ -27,14 +27,18 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/editText"
-        android:hint="Type Here"
+        android:hint="Type your message here!"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/textView2"
         android:background="@color/background_floating_material_dark"
         android:textColor="#ffffff"
         android:autoText="false"
-        android:textColorHint="#ffffff" />
+        android:textColorHint="#f8f8f8"
+        android:singleLine="true"
+        android:selectAllOnFocus="false"
+        android:textCursorDrawable="@null"
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="wrap_content"

@@ -200,7 +200,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 			total += f;
 		total /= floatQueue.size();
 
-        if (floatQueue.size() > 10)
+        if (floatQueue.size() > 20)
             floatQueue.remove();
 
         if(closestLat != 0)
@@ -312,7 +312,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                 messages[i] = drops[i].message;
             }
 
-            if(drops[0] != null)
+            if(drops.length > 0 && drops[0] != null)
             {
                 closestLat = drops[0].latitude;
                 closestLong = drops[0].longitude;
