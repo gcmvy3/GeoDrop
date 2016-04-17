@@ -13,8 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Latitude goes here"
-        android:id="@+id/latitude_text"
-        android:layout_above="@+id/longitude_text"
+        android:id="@+id/latitude_text_debug"
+        android:layout_above="@+id/longitude_text_debug"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="75dp" />
 
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Longitude goes here"
-        android:id="@+id/longitude_text"
+        android:id="@+id/longitude_text_debug"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
@@ -34,7 +34,7 @@
         android:id="@+id/latitude_label_text"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="28dp"
-        android:layout_above="@+id/latitude_text" />
+        android:layout_above="@+id/latitude_text_debug" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
         android:text="Default"
         android:id="@+id/longitude_label_text"
         android:layout_marginBottom="25dp"
-        android:layout_above="@+id/longitude_text"
+        android:layout_above="@+id/longitude_text_debug"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

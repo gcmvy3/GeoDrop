@@ -59,17 +59,22 @@ public class ActiveLocationService extends Service implements
     @Override
     public IBinder onBind(Intent intent)
     {
+        Log.i("Active Location Service", "Background service starting!");
+
+        // Create an instance of GoogleAPIClient to use for location tracking
+        if (mGoogleApiClient == null)
+        {
+            buildGoogleApiClient();
+        }
+
+        mGoogleApiClient.connect();
+
         return mBinder;
     }
 
     @Override
     public void onCreate()
     {
-        // Create an instance of GoogleAPIClient to use for location tracking
-        if (mGoogleApiClient == null)
-        {
-            buildGoogleApiClient();
-        }
     }
 
     protected synchronized void buildGoogleApiClient()
@@ -100,36 +105,35 @@ public class ActiveLocationService extends Service implements
 
             if (mCurrentLocation == null)
             {
-                Toast.makeText(this, "Error: could not determine location", Toast.LENGTH_SHORT).show();
+                Log.i("Active Location Service", "Error: Could not determine location");
             }
 
             startLocationUpdates();
         }
         catch(SecurityException e)
         {
-            Toast.makeText(this, "Error: location privileges not granted", Toast.LENGTH_SHORT).show();
+            Log.i("Active Location Service", "Error: Location privilege not granted");
         }
     }
 
     @Override
     public void onConnectionSuspended(int i)
     {
-        Toast.makeText(this, "Error: lost connection to Google API", Toast.LENGTH_SHORT).show();
+        Log.i("Active Location Service", "Error: Lost connection to Google API");
         mGoogleApiClient.connect(); // Attempts to reconnect to the API
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
-        Toast.makeText(this, "Error: could not connect to Google API", Toast.LENGTH_SHORT).show();
+        Log.i("Active Location Service", "Error: Could not connect to Google API");
     }
 
     @Override
     public void onLocationChanged(Location location)
     {
         mCurrentLocation = location;
-
-        //TODO: send this data to the bound activity
+        Log.i("Active Location Service", "Location changed!");
     }
 
     protected void startLocationUpdates()
@@ -141,17 +145,13 @@ public class ActiveLocationService extends Service implements
         }
         catch(SecurityException e)
         {
-            Toast.makeText(this, "Error: location privileges not granted", Toast.LENGTH_SHORT).show();
+            Log.i("Active Location Service", "Error: location privileges not granted");
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Toast.makeText(this, "Background service starting", Toast.LENGTH_SHORT).show();
-
-        mGoogleApiClient.connect();
-
         return super.onStartCommand(intent,flags,startId);
     }
 
