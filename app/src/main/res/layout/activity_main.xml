@@ -14,26 +14,47 @@
         android:layout_height="wrap_content"
         android:text="Debug"
         android:id="@+id/debugbutton"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="openDebug" />
+        android:onClick="openDebug"
+        android:layout_alignTop="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Drop"
         android:id="@+id/button"
+        android:onClick="dropMessage"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="dropMessage" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Search"
         android:id="@+id/button2"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="openSearch" />
+        android:onClick="openSearch"
+        android:layout_alignTop="@+id/debugbutton"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="/home/bryce/Documents/Side/GeoDrop/GeoDrop/app/src/main/res/mipmap-hdpi/globe.jpg"
+        android:contentDescription="globe"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/debugbutton" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Go exploring to find new messages!"
+        android:id="@+id/textView"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

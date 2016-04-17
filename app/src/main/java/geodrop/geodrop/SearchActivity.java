@@ -154,7 +154,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             float azimuthInRadians = mOrientation[0];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
 
-            mCurrentDegree = azimuthInDegress;
+            mCurrentDegree = -azimuthInDegress;
         }
         tvHeading.setText("Heading: " + Float.toString(mCurrentDegree) + " degrees");
     }
