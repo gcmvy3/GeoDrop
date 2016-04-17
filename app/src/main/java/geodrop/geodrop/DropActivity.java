@@ -1,6 +1,7 @@
 package geodrop.geodrop;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,10 +23,13 @@ public class DropActivity extends AppCompatActivity {
     private static URL url;
 
     TextView label;
+    TextView label2;
     String message;
 
     double latitude;
     double longitude;
+
+    EditText EDIT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,16 +38,20 @@ public class DropActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drop);
 
         label = (TextView) findViewById(R.id.textView2);
+        label2 = (TextView) findViewById(R.id.textView3);
 
         IP = getResources().getString(R.string.IP) + "adddrop?";
 
         latitude = getIntent().getDoubleExtra("latitude", 0);
         longitude = getIntent().getDoubleExtra("longitude", 0);
+
+        EDIT = (EditText) findViewById(R.id.editText);
     }
 
     public void sendDrop(View view) {
 
-        final EditText EDIT =  (EditText) findViewById(R.id.editText);
+        label.setText("");
+        label2.setText("");
 
         try
         {
@@ -123,10 +131,13 @@ public class DropActivity extends AppCompatActivity {
             if (wasSuccessful)
             {
                 //TODO: confirm that it was successful
+                EDIT.setText("");
+                label2.setText("Message Sent");
             }
             else
             {
                 //TODO: pop an error dialog
+                label.setText("Message did not Drop");
             }
         }
     }
