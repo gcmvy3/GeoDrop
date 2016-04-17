@@ -4,12 +4,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
-public class SearchActivity extends AppCompatActivity
+public class SearchActivity extends AppCompatActivity implements SensorEventListener
 {
     ActiveLocationService activeLocationService;
 
@@ -17,6 +22,14 @@ public class SearchActivity extends AppCompatActivity
     private boolean mBound = false;
 
     private Location mLocation;
+
+    // record the compass picture angle turned
+    private float currentDegree = 0f;
+
+    // device sensor manager
+    private SensorManager mSensorManager;
+
+    TextView tvHeading;
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
@@ -48,6 +61,12 @@ public class SearchActivity extends AppCompatActivity
                 }
             }
         };
+
+        // TextView that will tell the user what degree is he heading
+        tvHeading = (TextView) findViewById(R.id.tvHeading);
+
+        // initialize your android device sensor capabilities
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
     @Override
@@ -77,6 +96,23 @@ public class SearchActivity extends AppCompatActivity
         locationUpdater.interrupt();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // for the system's orientation sensor registered listeners
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // to stop the listener and save battery
+        mSensorManager.unregisterListener(this);
+    }
+
     // Used to communicate with the ActiveLocationService
     private ServiceConnection mConnection = new ServiceConnection()
     {
@@ -95,4 +131,19 @@ public class SearchActivity extends AppCompatActivity
             mBound = false;
         }
     };
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // get the angle around the z-axis rotated
+        float degree = Math.round(event.values[0]);
+
+        tvHeading.setText("Heading: " + Float.toString(degree) + " degrees");
+
+        currentDegree = -degree;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
