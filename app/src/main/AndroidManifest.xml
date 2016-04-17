@@ -34,7 +34,8 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".DropActivity"></activity>
+        <activity android:name=".DropActivity" />
+        <activity android:name=".MessagesActivity"></activity>
     </application>
 
 </manifest>

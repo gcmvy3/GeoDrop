@@ -114,6 +114,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void openList(View view) {
+        Intent intent = new Intent(this, MessagesActivity.class);
+        startActivity(intent);
+    }
+
     public void dropMessage(View view) {
         Intent intent = new Intent(this, DropActivity.class);
         intent.putExtra("latitude", mCurrentLocation.getLatitude());
