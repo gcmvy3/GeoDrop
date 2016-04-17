@@ -23,6 +23,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class SearchActivity extends AppCompatActivity implements SensorEventListener
 {
@@ -47,6 +51,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
     private float mCurrentDegree = 0f;
+    private Queue<Float> floatQueue = new LinkedBlockingQueue<>();
 
     TextView tvHeading;
 
@@ -54,6 +59,8 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
+
+    ArrayList<Drop> dropsList = new ArrayList<Drop>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,6 +79,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                     if (mBound)
                     {
                         mLocation = activeLocationService.getLocation();
+
+                        // Ask the server for nearby drops
+                        new ServerTask().execute(mLocation.getLatitude(), mLocation.getLongitude());
                     }
 
                     try
@@ -177,9 +187,19 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
             mCurrentDegree = -azimuthInDegress;
         }
-        tvHeading.setText("Heading: " + Float.toString(mCurrentDegree) + " degrees");
+        
+        floatQueue.add(mCurrentDegree);
 
-        arrowV.setRotation(mCurrentDegree);
+        float total = 0;
+		for (Float f : floatQueue)
+			total += f;
+		total /= floatQueue.size();
+
+        if (floatQueue.size() > 10)
+            floatQueue.remove();
+
+        arrowV.setRotation(total);
+        tvHeading.setText("Heading: " + Float.toString(total) + " degrees");
     }
 
     @Override
@@ -200,7 +220,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             String urlString = "uninitialized";
             try
             {
-                urlString = IP + "latitude=" + params[0] + "&longitude=";
+                urlString = IP + "latitude=" + params[0] + "&longitude=" + params[1];
 
                 url = new URL(urlString);
             }
@@ -231,8 +251,12 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                         //     numLines of message
                         //     message
                         //     */
+
+                        System.out.println("CurrentLine: " + currentLine);
+
                         if(currentLine.equals("Success"))
                         {
+                            System.out.println("Success!");
                             int numDrops = Integer.parseInt(reader.readLine());
 
                             drops = new Drop[numDrops];
@@ -275,6 +299,23 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         @Override
         protected void onPostExecute(Drop[] drops)
         {
+            System.out.println("Succesfully pulled drops: " + drops.length);
+
+            dropsList = new ArrayList<Drop>();
+
+            for(Drop d : drops)
+            {
+                dropsList.add(d);
+            }
+
+            String[] messages = new String[drops.length];
+            for(int i = 0; i < messages.length; i++)
+            {
+                messages[i] = drops[i].message;
+            }
+
+            MessagesActivity.updateMessages(messages);
+
             super.onPostExecute(drops);
         }
     }

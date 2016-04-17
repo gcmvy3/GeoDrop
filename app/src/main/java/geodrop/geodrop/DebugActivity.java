@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -21,15 +22,20 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class DebugActivity extends AppCompatActivity {
     ActiveLocationService activeLocationService;
 
+    String IP;
     URL url;
 
     // Tracks whether the location service is bound
@@ -47,6 +53,8 @@ public class DebugActivity extends AppCompatActivity {
 
     protected TextView mLatitudeLabelText;
     protected TextView mLongitudeLabelText;
+
+    protected TextView serverStatusText;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -66,11 +74,15 @@ public class DebugActivity extends AppCompatActivity {
         mLatitudeLabelText = (TextView) findViewById((R.id.latitude_label_text));
         mLongitudeLabelText = (TextView) findViewById((R.id.longitude_label_text));
 
+        serverStatusText = (TextView) findViewById((R.id.server_status_text));
+
         mLatitudeLabelText.setText(mLatitudeLabel);
         mLongitudeLabelText.setText(mLongitudeLabel);
 
+        IP = getResources().getString(R.string.IP);
+
         try {
-            url = new URL("http://172.16.100.110:8080/geodrop-server/api/");
+            url = new URL(IP);
         } catch (MalformedURLException e) {
             Log.i("DebugActivity", "Invalid URL!");
         }
@@ -197,5 +209,81 @@ public class DebugActivity extends AppCompatActivity {
     public void stopListening(View view)
     {
 
+    }
+
+    public void pingServer(View view)
+    {
+        new ServerTask().execute();
+    }
+
+    // This AsyncTask pings the server to see if it is connected
+    private class ServerTask extends AsyncTask<Void, Void, Boolean>
+    {
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+                String urlString = "uninitialized";
+                try
+                {
+                    urlString = IP + "online";
+
+                    url = new URL(urlString);
+                }
+                catch (MalformedURLException e)
+                {
+                    Log.i("Active Location Service", "Invalid URL!");
+                }
+
+                URLConnection connection = null;
+                try
+                {
+                    connection = url.openConnection();
+                    connection.setConnectTimeout(5000);
+
+                    System.out.println("Connected to server!");
+
+                    InputStream is = connection.getInputStream();
+                    InputStreamReader isr = new InputStreamReader(is);
+                    BufferedReader reader = new BufferedReader(isr);
+
+                    String currentLine = null;
+                    while ((currentLine = reader.readLine()) != null)
+                    {
+                        if (currentLine.equals("Yes"))
+                        {
+                            return true;
+                        }
+                    }
+                    reader.close();
+
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            return false;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            serverStatusText.setText("Pinging Server...");
+        }
+
+        @Override
+        protected void onPostExecute(Boolean receivedResponse)
+        {
+            super.onPostExecute(receivedResponse);
+
+            if(receivedResponse)
+            {
+                serverStatusText.setText("Server Connected!");
+            }
+            else
+            {
+                serverStatusText.setText("No response!");
+            }
+        }
     }
 }
