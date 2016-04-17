@@ -53,6 +53,11 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     private float mCurrentDegree = 0f;
     private Queue<Float> floatQueue = new LinkedBlockingQueue<>();
 
+    private double closestLong;
+    private double closestLat;
+
+    private double degree2 = 0;
+
     TextView tvHeading;
 
     ImageView arrowV;
@@ -198,7 +203,13 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         if (floatQueue.size() > 10)
             floatQueue.remove();
 
-        arrowV.setRotation(total);
+        if(closestLat != 0)
+        {
+            degree2 = Math.cosh((mLocation.getLatitude() * closestLong) + (mLocation.getLongitude() * closestLat))/
+                    (Math.sqrt(mLocation.getLongitude() * mLocation.getLongitude() + closestLong * closestLong)+
+                            Math.sqrt(mLocation.getLatitude() * mLocation.getLatitude() + closestLat * closestLat));
+        }
+        arrowV.setRotation(total + (float) degree2);
         tvHeading.setText("Heading: " + Float.toString(total) + " degrees");
     }
 
@@ -213,33 +224,27 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     private class ServerTask extends AsyncTask<Double, Void, Drop[]>
     {
         @Override
-        protected Drop[] doInBackground(Double... params)
-        {
+        protected Drop[] doInBackground(Double... params) {
             Drop[] drops = new Drop[0];
 
             String urlString = "uninitialized";
-            try
-            {
+            try {
                 urlString = IP + "latitude=" + params[0] + "&longitude=" + params[1];
 
                 url = new URL(urlString);
-            }
-            catch (MalformedURLException e)
-            {
+            } catch (MalformedURLException e) {
                 Log.i("Active Location Service", "Invalid URL!");
             }
 
             URLConnection connection = null;
-            try
-            {
+            try {
                 connection = url.openConnection();
                 connection.setConnectTimeout(5000);
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 {
                     String currentLine = null;
-                    while ((currentLine = reader.readLine()) != null)
-                    {
+                    while ((currentLine = reader.readLine()) != null) {
                         //Reads in a huge string from the server and parses drops from it
                         //Format of data from the server:
 
@@ -254,8 +259,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
                         System.out.println("CurrentLine: " + currentLine);
 
-                        if(currentLine.equals("Success"))
-                        {
+                        if (currentLine.equals("Success")) {
                             System.out.println("Success!");
                             int numDrops = Integer.parseInt(reader.readLine());
 
@@ -266,16 +270,14 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                             int numLines;
                             String message;
 
-                            for(int i = 0; i < numDrops; i++)
-                            {
+                            for (int i = 0; i < numDrops; i++) {
                                 lat = Double.parseDouble(reader.readLine());
                                 lon = Double.parseDouble(reader.readLine());
 
                                 numLines = Integer.parseInt(reader.readLine());
                                 message = "";
 
-                                for(int j = 0; j < numLines; j++)
-                                {
+                                for (int j = 0; j < numLines; j++) {
                                     message += reader.readLine();
                                 }
 
@@ -286,8 +288,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                     }
                 }
 
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -297,21 +298,24 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         }
 
         @Override
-        protected void onPostExecute(Drop[] drops)
-        {
+        protected void onPostExecute(Drop[] drops) {
             System.out.println("Succesfully pulled drops: " + drops.length);
 
             dropsList = new ArrayList<Drop>();
 
-            for(Drop d : drops)
-            {
+            for (Drop d : drops) {
                 dropsList.add(d);
             }
 
             String[] messages = new String[drops.length];
-            for(int i = 0; i < messages.length; i++)
-            {
+            for (int i = 0; i < messages.length; i++) {
                 messages[i] = drops[i].message;
+            }
+
+            if(drops[0] != null)
+            {
+                closestLat = drops[0].latitude;
+                closestLong = drops[0].longitude;
             }
 
             MessagesActivity.updateMessages(messages);
