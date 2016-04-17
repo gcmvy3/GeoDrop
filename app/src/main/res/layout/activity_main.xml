@@ -7,20 +7,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/background_material_dark"
     tools:context="geodrop.geodrop.MainActivity">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Debug"
-        android:id="@+id/debugbutton"
-        android:onClick="openDebug"
+        android:text="List"
+        android:id="@+id/listbutton"
         android:layout_alignTop="@+id/button"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/colorPrimaryDark"
         android:textColor="#ffffff"
-        android:layout_toStartOf="@+id/button2" />
+        android:layout_toStartOf="@+id/button2"
+        android:onClick="openList" />
 
     <Button
         android:layout_width="fill_parent"
@@ -41,10 +42,10 @@
         android:text="Search"
         android:id="@+id/button2"
         android:onClick="openSearch"
-        android:layout_alignTop="@+id/debugbutton"
-        android:layout_centerHorizontal="true"
         android:textColor="#ffffff"
-        android:background="@color/colorPrimary" />
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,7 +53,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Go exploring to find new messages!"
         android:id="@+id/textView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:textAlignment="center" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -61,5 +64,15 @@
         android:src="@mipmap/globe"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/debugbutton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        android:onClick="openDebug" />
 
 </RelativeLayout>

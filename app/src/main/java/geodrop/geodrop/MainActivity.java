@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity
     // Keeps track of whether the location service is bound
     private boolean mBound = false;
 
-    private Location mCurrentLocation;
+    private static Location mCurrentLocation;
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
@@ -114,6 +114,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void openList(View view) {
+        Intent intent = new Intent(this, MessagesActivity.class);
+        startActivity(intent);
+    }
+
     public void dropMessage(View view) {
         Intent intent = new Intent(this, DropActivity.class);
         intent.putExtra("latitude", mCurrentLocation.getLatitude());
@@ -136,4 +141,9 @@ public class MainActivity extends AppCompatActivity
             mBound = false;
         }
     };
+
+    public static synchronized Location getLocation()
+    {
+        return mCurrentLocation;
+    }
 }
