@@ -6,4 +6,5 @@
     <string name="location_updated">Location Updated</string>
     <string name="drop">Drop!</string>
     <string name="IP">http://192.168.111.143:8080/geodrop-server/api/</string>
+    <string name="no_messages">No Messages Detected</string>
 </resources>
