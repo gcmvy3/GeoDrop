@@ -54,4 +54,14 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, DebugActivity.class);
         startActivity(intent);
     }
+
+    public void openSearch(View view) {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
+    }
+
+    public void dropMessage(View view) {
+        Intent intent = new Intent(this, DebugActivity.class);
+        startActivity(intent);
+    }
 }
