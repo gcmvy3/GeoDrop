@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
@@ -186,4 +187,12 @@ public class DebugActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+    public void startListening(View view) {
+
+    }
+
+    public void stopListening(View view) {
+
+    }
 }
