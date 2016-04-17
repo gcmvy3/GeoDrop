@@ -55,6 +55,8 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     // This thread updates the location every few seconds
     Thread locationUpdater;
 
+    Drop[] dropsArray = new Drop[0];
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -72,6 +74,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                     if (mBound)
                     {
                         mLocation = activeLocationService.getLocation();
+
+                        // Ask the server for nearby drops
+                        new ServerTask().execute(mLocation.getLatitude(), mLocation.getLongitude());
                     }
 
                     try
@@ -200,7 +205,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             String urlString = "uninitialized";
             try
             {
-                urlString = IP + "latitude=" + params[0] + "&longitude=";
+                urlString = IP + "latitude=" + params[0] + "&longitude=" + params[1];
 
                 url = new URL(urlString);
             }
@@ -231,8 +236,12 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
                         //     numLines of message
                         //     message
                         //     */
+
+                        System.out.println("CurrentLine: " + currentLine);
+
                         if(currentLine.equals("Success"))
                         {
+                            System.out.println("Success!");
                             int numDrops = Integer.parseInt(reader.readLine());
 
                             drops = new Drop[numDrops];
@@ -275,6 +284,19 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         @Override
         protected void onPostExecute(Drop[] drops)
         {
+            System.out.println("Succesfully pulled drops: " + drops.length);
+
+            dropsArray = drops;
+
+            String[] messages = new String[drops.length];
+            for(int i = 0; i < messages.length; i++)
+            {
+                messages[i] = drops[i].message;
+                System.out.println(messages[i]);
+            }
+
+            MessagesActivity.updateMessages(messages);
+
             super.onPostExecute(drops);
         }
     }

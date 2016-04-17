@@ -83,7 +83,8 @@ public class DropActivity extends AppCompatActivity {
                 String urlString = "uninitialized";
                 try
                 {
-                    urlString = IP + "latitude=" + params[0] + "&longitude=" + params[1] + "&message=" + message;
+                    urlString = IP + "latitude=" + params[0] + "&longitude=" + params[1] + "&message=" +
+                            message.replace(' ', '_').replace('\n',';');
 
                     url = new URL(urlString);
                 }

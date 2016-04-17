@@ -260,7 +260,6 @@ public class ActiveLocationService extends Service implements
 
             if(isNearbyDrop)
             {
-                System.out.println("NEARBY DROP!");
             }
         }
     }
