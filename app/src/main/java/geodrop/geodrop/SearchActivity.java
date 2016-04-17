@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class SearchActivity extends AppCompatActivity implements SensorEventListener
 {
@@ -47,6 +49,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
     private float mCurrentDegree = 0f;
+    private Queue<Float> floatQueue = new LinkedBlockingQueue<>();
 
     TextView tvHeading;
 
@@ -182,9 +185,19 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
             mCurrentDegree = -azimuthInDegress;
         }
-        tvHeading.setText("Heading: " + Float.toString(mCurrentDegree) + " degrees");
+        
+        floatQueue.add(mCurrentDegree);
 
-        arrowV.setRotation(mCurrentDegree);
+        float total = 0;
+		for (Float f : floatQueue)
+			total += f;
+		total /= floatQueue.size();
+
+        if (floatQueue.size() > 10)
+            floatQueue.remove()
+
+        arrowV.setRotation(total);
+        tvHeading.setText("Heading: " + Float.toString(total) + " degrees");
     }
 
     @Override
