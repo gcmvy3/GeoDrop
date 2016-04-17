@@ -50,9 +50,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageView iv = (ImageView)findViewById(R.id.globeid);
-        iv.setImageResource(R.drawable.globe);
-
         locationUpdater = new Thread() {
             Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -70,9 +67,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
-
-        ImageView imageV = (ImageView)findViewById(R.id.globeid);
-        imageV.setImageResource(R.drawable.globe);
     }
 
     @Override
