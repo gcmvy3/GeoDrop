@@ -314,8 +314,14 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
             if(drops.length > 0 && drops[0] != null)
             {
+                System.out.println("Debug");
                 closestLat = drops[0].latitude;
                 closestLong = drops[0].longitude;
+            }
+            else
+            {
+                closestLat = 0;
+                closestLong = 0;
             }
 
             MessagesActivity.updateMessages(messages);

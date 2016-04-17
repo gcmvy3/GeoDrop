@@ -47,13 +47,13 @@ public class MessagesActivity extends Activity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public static void updateMessages(String[] messages) {
+    public static void updateMessages(String[] messages)
+    {
         messageArray = messages;
 
-        if (arrayAdapter != null) {
+        if (arrayAdapter != null)
+        {
             arrayAdapter.notifyDataSetChanged();
-            no_message.setVisibility(View.VISIBLE);
-
         }
     }
 

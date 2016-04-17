@@ -2,6 +2,7 @@ package geodrop.geodrop;
 
 import android.app.IntentService;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -40,7 +41,7 @@ public class ActiveLocationService extends Service implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
-    final static String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
+    final String IP = "http://192.168.111.143:8080/geodrop-server/api/getifnearby?";
 
     private static URL url;
 

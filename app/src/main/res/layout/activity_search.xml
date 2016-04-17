@@ -20,5 +20,19 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Follow the arrow to the closest drop!"
+        android:id="@+id/textView4"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="31dp"
+        android:textColor="#ffffff"
+        android:textAlignment="center"
+        android:textSize="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
 

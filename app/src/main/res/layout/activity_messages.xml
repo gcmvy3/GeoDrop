@@ -20,15 +20,4 @@
         android:entries="@color/background_material_dark">
     </ListView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/no_messages"
-        android:id="@+id/no_message"
-        android:layout_marginTop="48dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone" />
-
 </RelativeLayout>
