@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -58,7 +60,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     // This thread updates the location every few seconds
     Thread locationUpdater;
 
-    Drop[] dropsArray = new Drop[0];
+    ArrayList<Drop> dropsList = new ArrayList<Drop>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -194,7 +196,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 		total /= floatQueue.size();
 
         if (floatQueue.size() > 10)
-            floatQueue.remove()
+            floatQueue.remove();
 
         arrowV.setRotation(total);
         tvHeading.setText("Heading: " + Float.toString(total) + " degrees");
@@ -299,13 +301,17 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         {
             System.out.println("Succesfully pulled drops: " + drops.length);
 
-            dropsArray = drops;
+            dropsList = new ArrayList<Drop>();
+
+            for(Drop d : drops)
+            {
+                dropsList.add(d);
+            }
 
             String[] messages = new String[drops.length];
             for(int i = 0; i < messages.length; i++)
             {
                 messages[i] = drops[i].message;
-                System.out.println(messages[i]);
             }
 
             MessagesActivity.updateMessages(messages);
