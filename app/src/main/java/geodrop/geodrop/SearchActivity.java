@@ -23,11 +23,16 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
     private Location mLocation;
 
-    // record the compass picture angle turned
-    private float currentDegree = 0f;
-
-    // device sensor manager
     private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private Sensor mMagnetometer;
+    private float[] mLastAccelerometer = new float[3];
+    private float[] mLastMagnetometer = new float[3];
+    private boolean mLastAccelerometerSet = false;
+    private boolean mLastMagnetometerSet = false;
+    private float[] mR = new float[9];
+    private float[] mOrientation = new float[3];
+    private float mCurrentDegree = 0f;
 
     TextView tvHeading;
 
@@ -65,8 +70,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         // TextView that will tell the user what degree is he heading
         tvHeading = (TextView) findViewById(R.id.tvHeading);
 
-        // initialize your android device sensor capabilities
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     @Override
@@ -96,21 +102,18 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         locationUpdater.interrupt();
     }
 
-    @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
-
-        // for the system's orientation sensor registered listeners
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-                SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
-    @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
-
-        // to stop the listener and save battery
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(this, mAccelerometer);
+        mSensorManager.unregisterListener(this, mMagnetometer);
     }
 
     // Used to communicate with the ActiveLocationService
@@ -133,17 +136,32 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     };
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        // get the angle around the z-axis rotated
-        float degree = Math.round(event.values[0]);
+    public void onSensorChanged(SensorEvent event)
+    {
+        if (event.sensor == mAccelerometer)
+        {
+            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+            mLastAccelerometerSet = true;
+        } else if (event.sensor == mMagnetometer)
+        {
+            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
+            mLastMagnetometerSet = true;
+        }
+        if (mLastAccelerometerSet && mLastMagnetometerSet)
+        {
+            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            SensorManager.getOrientation(mR, mOrientation);
+            float azimuthInRadians = mOrientation[0];
+            float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
 
-        tvHeading.setText("Heading: " + Float.toString(degree) + " degrees");
-
-        currentDegree = -degree;
+            mCurrentDegree = -azimuthInDegress;
+        }
+        tvHeading.setText("Heading: " + Float.toString(mCurrentDegree) + " degrees");
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
 
     }
 }
