@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity
     ActiveLocationService activeLocationService;
 
     // Keeps track of whether the location service is bound
-    private boolean mBound = false;
+    private boolean bound = false;
 
-    private static Location mCurrentLocation;
+    private static Location currentLocation;
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity
     protected static final String TAG = "MainActivity";
 
     // For displaying the user's location on the screen
-    protected TextView mLatitudeText;
-    protected TextView mLongitudeText;
+    protected TextView latitudeText;
+    protected TextView longitudeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,9 +56,9 @@ public class MainActivity extends AppCompatActivity
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        if (mBound)
+                        if (bound)
                         {
-                            mCurrentLocation = activeLocationService.getLocation();
+                            currentLocation = activeLocationService.getLocation();
                         }
 
                         Thread.sleep(500);
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
 
         // Launch a location service and bind to it
         Intent intent = new Intent(this, ActiveLocationService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
         if (!locationUpdater.isAlive())
         {
@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
 
         // Unbind from the location service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
+        if (bound) {
+            unbindService(connection);
+            bound = false;
         }
 
         locationUpdater.interrupt();
@@ -115,29 +115,29 @@ public class MainActivity extends AppCompatActivity
 
     public void dropMessage(View view) {
         Intent intent = new Intent(this, DropActivity.class);
-        intent.putExtra("latitude", mCurrentLocation.getLatitude());
-        intent.putExtra("longitude", mCurrentLocation.getLongitude());
+        intent.putExtra("latitude", currentLocation.getLatitude());
+        intent.putExtra("longitude", currentLocation.getLongitude());
         startActivity(intent);
     }
 
     // Used to communicate with the ActiveLocationService
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ActiveLocationService.LocalBinder binder = (ActiveLocationService.LocalBinder) service;
             activeLocationService = binder.getService();
-            mBound = true;
+            bound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+            bound = false;
         }
     };
 
     public static synchronized Location getLocation()
     {
-        return mCurrentLocation;
+        return currentLocation;
     }
 }

@@ -53,18 +53,18 @@ public class ActiveLocationService extends Service implements
                                 UPDATE_INTERVAL_IN_MS / 2;
 
     // Used to communicate with the Google servers
-    protected GoogleApiClient mGoogleApiClient;
+    protected GoogleApiClient googleApiClient;
 
     // Used to request the phone's location from Google's servers
     protected LocationRequest mLocationRequest;
 
     // The most recent location of the user's phone
-    private Location mCurrentLocation;
+    private Location currentLocation;
 
     private boolean nearbyDrop = false;
 
     // Binder given to clients
-    private final IBinder mBinder = new LocalBinder();
+    private final IBinder binder = new LocalBinder();
 
     public class LocalBinder extends Binder
     {
@@ -82,14 +82,14 @@ public class ActiveLocationService extends Service implements
         Log.i("Active Location Service", "Background service starting!");
 
         // Create an instance of GoogleAPIClient to use for location tracking
-        if (mGoogleApiClient == null)
+        if (googleApiClient == null)
         {
             buildGoogleApiClient();
         }
 
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
 
-        return mBinder;
+        return binder;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class ActiveLocationService extends Service implements
 
     protected synchronized void buildGoogleApiClient()
     {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API) // This line lets us use location services
@@ -123,9 +123,9 @@ public class ActiveLocationService extends Service implements
         //Called when the GoogleApiClient connects
         try
         {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-            if (mCurrentLocation == null)
+            if (currentLocation == null)
             {
                 Log.i("Active Location Service", "Error: Could not determine location");
             }
@@ -141,7 +141,7 @@ public class ActiveLocationService extends Service implements
     public void onConnectionSuspended(int i)
     {
         Log.i("Active Location Service", "Error: Lost connection to Google API");
-        mGoogleApiClient.connect(); // Attempts to reconnect to the API
+        googleApiClient.connect(); // Attempts to reconnect to the API
     }
 
     @Override
@@ -153,7 +153,7 @@ public class ActiveLocationService extends Service implements
     @Override
     public void onLocationChanged(Location location)
     {
-        mCurrentLocation = location;
+        currentLocation = location;
 
         if(location != null)
         {
@@ -168,7 +168,7 @@ public class ActiveLocationService extends Service implements
         try
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
+                    googleApiClient, mLocationRequest, this);
         } catch (SecurityException e)
         {
             Log.i("Active Location Service", "Error: location privileges not granted");
@@ -185,15 +185,15 @@ public class ActiveLocationService extends Service implements
     public void onDestroy()
     {
         // Disconnect from the google location servers
-        if (mGoogleApiClient.isConnected())
+        if (googleApiClient.isConnected())
         {
-            mGoogleApiClient.disconnect();
+            googleApiClient.disconnect();
         }
     }
 
     public Location getLocation()
     {
-        return mCurrentLocation;
+        return currentLocation;
     }
 
     // This AsyncTask takes in a latitude and longitude and sends them to the server
@@ -203,7 +203,7 @@ public class ActiveLocationService extends Service implements
         @Override
         protected Boolean doInBackground(Double... params)
         {
-            if (mCurrentLocation != null)
+            if (currentLocation != null)
             {
                 String urlString = "uninitialized";
                 try

@@ -39,20 +39,20 @@ public class DebugActivity extends AppCompatActivity {
     URL url;
 
     // Tracks whether the location service is bound
-    private boolean mBound = false;
+    private boolean bound = false;
 
-    private Location mCurrentLocation;
+    private Location currentLocation;
 
     // This thread updates the location every few seconds
     Thread locationUpdater;
 
-    protected String mLatitudeLabel;
-    protected String mLongitudeLabel;
-    protected TextView mLatitudeText;
-    protected TextView mLongitudeText;
+    protected String latitudeLabel;
+    protected String longitudeLabel;
+    protected TextView latitudeText;
+    protected TextView longitudeText;
 
-    protected TextView mLatitudeLabelText;
-    protected TextView mLongitudeLabelText;
+    protected TextView latitudeLabelText;
+    protected TextView longitudeLabelText;
 
     protected TextView serverStatusText;
     /**
@@ -66,18 +66,18 @@ public class DebugActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
 
-        mLatitudeLabel = getResources().getString(R.string.latitude_label);
-        mLongitudeLabel = getResources().getString(R.string.longitude_label);
-        mLatitudeText = (TextView) findViewById((R.id.latitude_text_debug));
-        mLongitudeText = (TextView) findViewById((R.id.longitude_text_debug));
+        latitudeLabel = getResources().getString(R.string.latitude_label);
+        longitudeLabel = getResources().getString(R.string.longitude_label);
+        latitudeText = (TextView) findViewById((R.id.latitude_text_debug));
+        longitudeText = (TextView) findViewById((R.id.longitude_text_debug));
 
-        mLatitudeLabelText = (TextView) findViewById((R.id.latitude_label_text));
-        mLongitudeLabelText = (TextView) findViewById((R.id.longitude_label_text));
+        latitudeLabelText = (TextView) findViewById((R.id.latitude_label_text));
+        longitudeLabelText = (TextView) findViewById((R.id.longitude_label_text));
 
         serverStatusText = (TextView) findViewById((R.id.server_status_text));
 
-        mLatitudeLabelText.setText(mLatitudeLabel);
-        mLongitudeLabelText.setText(mLongitudeLabel);
+        latitudeLabelText.setText(latitudeLabel);
+        longitudeLabelText.setText(longitudeLabel);
 
         IP = getResources().getString(R.string.IP);
 
@@ -93,7 +93,7 @@ public class DebugActivity extends AppCompatActivity {
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        if (mBound)
+                        if (bound)
                         {
                             // Update the location and the UI
                             // UI update must be done with handler.post
@@ -102,7 +102,7 @@ public class DebugActivity extends AppCompatActivity {
                                 @Override
                                 public void run()
                                 {
-                                    mCurrentLocation = activeLocationService.getLocation();
+                                    currentLocation = activeLocationService.getLocation();
                                     updateUI();
                                 }
                             });
@@ -128,7 +128,7 @@ public class DebugActivity extends AppCompatActivity {
 
         // Launch a location service and bind to it
         Intent intent = new Intent(this, ActiveLocationService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
         if (!locationUpdater.isAlive()) {
             locationUpdater.start();
@@ -166,9 +166,9 @@ public class DebugActivity extends AppCompatActivity {
         AppIndex.AppIndexApi.end(client, viewAction);
 
         // Unbind from the location service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
+        if (bound) {
+            unbindService(connection);
+            bound = false;
         }
 
         locationUpdater.interrupt();
@@ -178,25 +178,25 @@ public class DebugActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        if (mCurrentLocation != null) {
-            mLatitudeText.setText(String.valueOf(mCurrentLocation.getLatitude()));
-            mLongitudeText.setText(String.valueOf(mCurrentLocation.getLongitude()));
+        if (currentLocation != null) {
+            latitudeText.setText(String.valueOf(currentLocation.getLatitude()));
+            longitudeText.setText(String.valueOf(currentLocation.getLongitude()));
         }
     }
 
     // Used to communicate with the ActiveLocationService
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ActiveLocationService.LocalBinder binder = (ActiveLocationService.LocalBinder) service;
             activeLocationService = binder.getService();
-            mBound = true;
+            bound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+            bound = false;
         }
     };
 

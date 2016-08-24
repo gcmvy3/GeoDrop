@@ -51,13 +51,13 @@ public class PassiveLocationService extends Service implements
                                     UPDATE_INTERVAL_IN_MS / 2;
 
     // Used to communicate with the Google servers
-    protected GoogleApiClient mGoogleApiClient;
+    protected GoogleApiClient googleApiClient;
 
     // Used to request the phone's location from Google's servers
-    protected LocationRequest mLocationRequest;
+    protected LocationRequest locationRequest;
 
     // The most recent location of the user's phone
-    private Location mCurrentLocation;
+    private Location currentLocation;
 
     private boolean hasNotified = false;
 
@@ -67,7 +67,7 @@ public class PassiveLocationService extends Service implements
         IP = getResources().getString(R.string.IP) + "getifnearby?";
 
         // Create an instance of GoogleAPIClient to use for location tracking
-        if (mGoogleApiClient == null)
+        if (googleApiClient == null)
         {
             buildGoogleApiClient();
         }
@@ -75,7 +75,7 @@ public class PassiveLocationService extends Service implements
 
     protected synchronized void buildGoogleApiClient()
     {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API) // This line lets us use location services
@@ -85,10 +85,10 @@ public class PassiveLocationService extends Service implements
 
     protected void createLocationRequest()
     {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(UPDATE_INTERVAL_IN_MS);
+        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MS);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
@@ -97,9 +97,9 @@ public class PassiveLocationService extends Service implements
         //Called when the GoogleApiClient connects
         try
         {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-            if (mCurrentLocation == null)
+            if (currentLocation == null)
             {
                 Toast.makeText(this, "Error: could not determine location", Toast.LENGTH_SHORT).show();
             }
@@ -116,7 +116,7 @@ public class PassiveLocationService extends Service implements
     public void onConnectionSuspended(int i)
     {
         Toast.makeText(this, "Error: lost connection to Google API", Toast.LENGTH_SHORT).show();
-        mGoogleApiClient.connect(); // Attempts to reconnect to the API
+        googleApiClient.connect(); // Attempts to reconnect to the API
     }
 
     @Override
@@ -128,7 +128,7 @@ public class PassiveLocationService extends Service implements
     @Override
     public void onLocationChanged(Location location)
     {
-        mCurrentLocation = location;
+        currentLocation = location;
 
         if(location != null)
         {
@@ -143,7 +143,7 @@ public class PassiveLocationService extends Service implements
         try
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
+                    googleApiClient, locationRequest, this);
         }
         catch(SecurityException e)
         {
@@ -156,7 +156,7 @@ public class PassiveLocationService extends Service implements
     {
         Toast.makeText(this, "Background service starting", Toast.LENGTH_SHORT).show();
 
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
 
         return START_STICKY;
     }
@@ -165,9 +165,9 @@ public class PassiveLocationService extends Service implements
     public void onDestroy()
     {
         // Disconnect from the google location servers
-        if(mGoogleApiClient.isConnected())
+        if(googleApiClient.isConnected())
         {
-            mGoogleApiClient.disconnect();
+            googleApiClient.disconnect();
         }
     }
 
@@ -209,13 +209,13 @@ public class PassiveLocationService extends Service implements
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
+        NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Build and display the notification
         // mId allows you to update the notification later on.
         int mId = 28;
-        mNotificationManager.notify(mId, mBuilder.build());
+        notificationManager.notify(mId, mBuilder.build());
     }
 
     // This AsyncTask takes in a latitude and longitude and sends them to the server
@@ -225,7 +225,7 @@ public class PassiveLocationService extends Service implements
         @Override
         protected Boolean doInBackground(Double... params)
         {
-            if (mCurrentLocation != null)
+            if (currentLocation != null)
             {
                 String urlString = "uninitialized";
                 try

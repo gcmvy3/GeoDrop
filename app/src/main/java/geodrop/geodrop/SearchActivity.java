@@ -37,20 +37,20 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     URL url;
 
     // Tracks whether the location service is bound
-    private boolean mBound = false;
+    private boolean bound = false;
 
-    private Location mLocation;
+    private Location location;
 
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private Sensor mMagnetometer;
-    private float[] mLastAccelerometer = new float[3];
-    private float[] mLastMagnetometer = new float[3];
-    private boolean mLastAccelerometerSet = false;
-    private boolean mLastMagnetometerSet = false;
-    private float[] mR = new float[9];
-    private float[] mOrientation = new float[3];
-    private float mCurrentDegree = 0f;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private Sensor magnetometer;
+    private float[] lastAccelerometer = new float[3];
+    private float[] lastMagnetometer = new float[3];
+    private boolean lastAccelerometerSet = false;
+    private boolean lastMagnetometerSet = false;
+    private float[] r = new float[9];
+    private float[] orientation = new float[3];
+    private float currentDegree = 0f;
     private Queue<Float> floatQueue = new LinkedBlockingQueue<>();
 
     private double closestLong;
@@ -81,12 +81,12 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             {
                 while(!Thread.currentThread().isInterrupted())
                 {
-                    if (mBound)
+                    if (bound)
                     {
-                        mLocation = activeLocationService.getLocation();
+                        location = activeLocationService.getLocation();
 
                         // Ask the server for nearby drops
-                        new ServerTask().execute(mLocation.getLatitude(), mLocation.getLongitude());
+                        new ServerTask().execute(location.getLatitude(), location.getLongitude());
                     }
 
                     try
@@ -103,9 +103,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         // TextView that will tell the user what degree is he heading
         tvHeading = (TextView) findViewById(R.id.tvHeading);
 
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         arrowV = (ImageView)findViewById(R.id.arrowView);
         arrowV.setImageResource(R.drawable.arrow);
@@ -118,7 +118,7 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
         // Launch a location service and bind to it
         Intent intent = new Intent(this, ActiveLocationService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
         locationUpdater.start();
     }
@@ -129,10 +129,10 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
         super.onStop();
 
         // Unbind from the location service
-        if (mBound)
+        if (bound)
         {
-            unbindService(mConnection);
-            mBound = false;
+            unbindService(connection);
+            bound = false;
         }
 
         locationUpdater.interrupt();
@@ -141,19 +141,19 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
     protected void onResume()
     {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     protected void onPause()
     {
         super.onPause();
-        mSensorManager.unregisterListener(this, mAccelerometer);
-        mSensorManager.unregisterListener(this, mMagnetometer);
+        sensorManager.unregisterListener(this, accelerometer);
+        sensorManager.unregisterListener(this, magnetometer);
     }
 
     // Used to communicate with the ActiveLocationService
-    private ServiceConnection mConnection = new ServiceConnection()
+    private ServiceConnection connection = new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
@@ -161,39 +161,39 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ActiveLocationService.LocalBinder binder = (ActiveLocationService.LocalBinder) service;
             activeLocationService = binder.getService();
-            mBound = true;
+            bound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0)
         {
-            mBound = false;
+            bound = false;
         }
     };
 
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        if (event.sensor == mAccelerometer)
+        if (event.sensor == accelerometer)
         {
-            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
-            mLastAccelerometerSet = true;
-        } else if (event.sensor == mMagnetometer)
+            System.arraycopy(event.values, 0, lastAccelerometer, 0, event.values.length);
+            lastAccelerometerSet = true;
+        } else if (event.sensor == magnetometer)
         {
-            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
-            mLastMagnetometerSet = true;
+            System.arraycopy(event.values, 0, lastMagnetometer, 0, event.values.length);
+            lastMagnetometerSet = true;
         }
-        if (mLastAccelerometerSet && mLastMagnetometerSet)
+        if (lastAccelerometerSet && lastMagnetometerSet)
         {
-            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
-            SensorManager.getOrientation(mR, mOrientation);
-            float azimuthInRadians = mOrientation[0];
+            SensorManager.getRotationMatrix(r, null, lastAccelerometer, lastMagnetometer);
+            SensorManager.getOrientation(r, orientation);
+            float azimuthInRadians = orientation[0];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
 
-            mCurrentDegree = -azimuthInDegress;
+            currentDegree = -azimuthInDegress;
         }
         
-        floatQueue.add(mCurrentDegree);
+        floatQueue.add(currentDegree);
 
         float total = 0;
 		for (Float f : floatQueue)
@@ -205,9 +205,9 @@ public class SearchActivity extends AppCompatActivity implements SensorEventList
 
         if(closestLat != 0)
         {
-            degree2 = Math.cosh((mLocation.getLatitude() * closestLong) + (mLocation.getLongitude() * closestLat))/
-                    (Math.sqrt(mLocation.getLongitude() * mLocation.getLongitude() + closestLong * closestLong)+
-                            Math.sqrt(mLocation.getLatitude() * mLocation.getLatitude() + closestLat * closestLat));
+            degree2 = Math.cosh((location.getLatitude() * closestLong) + (location.getLongitude() * closestLat))/
+                    (Math.sqrt(location.getLongitude() * location.getLongitude() + closestLong * closestLong)+
+                            Math.sqrt(location.getLatitude() * location.getLatitude() + closestLat * closestLat));
         }
         else
         {
